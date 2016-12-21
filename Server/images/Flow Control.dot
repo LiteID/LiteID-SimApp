@@ -1,0 +1,25 @@
+digraph finite_state_machine {
+    Actions [label="\"Actions: \lPrint Address: ADDR\lAdd Item: ADD <Text to add>\lShow Items: SHOW\lCheck Identity: CHECK\""];
+    "Session Start" -> "Current User?"
+    "Current User?" -> "\"Create Account? (y/n)\"" [label="No"]
+    "\"Create Account? (y/n)\"" -> "Session Start" [label="\"N\""]
+    "\"Create Account? (y/n)\"" -> "\"Account Created\"" [label="\"Y\""]
+    "\"Account Created\"" -> "Session Start"
+    "Current User?" -> Actions [label="Yes"]
+    Actions -> "Return Address" [label="ADDR"]
+    "Return Address" -> Actions
+    Actions -> "Add Item" [label="ADD"]
+    "Add Item" -> Actions
+    Actions -> "Return Stored items" [label="SHOW"]
+    "Return Stored items" -> Actions
+    Actions -> "\"What is the Address?\"" [label="CHECK"]
+    "\"What is the Address?\""-> "Invalid Please Try again" [label="Invalid"]
+    "Invalid Please Try again" -> "\"What is the Address?\""
+    "\"What is the Address?\"" -> "\"What is the Data or Hash to check?\"" [label="Valid"]
+    "\"What is the Data or Hash to check?\"" -> "\"Not Valid\"" [label="String in Contract"]
+    "\"What is the Data or Hash to check?\"" -> "\"Valid\"" [label="String not in Contract"]
+    "\"Valid\"" -> "\"Exit?\""
+    "\"Not Valid\"" -> "\"Exit? (y/n)\""
+    "\"Exit? (y/n)\"" -> Actions [label="Y"]
+    "\"Exit? (y/n)\"" -> "\"What is the Data or Hash to check?\"" [label="N"]
+}
