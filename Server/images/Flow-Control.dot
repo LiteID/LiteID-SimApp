@@ -10,7 +10,7 @@ digraph finite_state_machine {
 	return_stored_items [label="Return Stored items"]
 	what_is_the_address [label="\"What is the Address?\""]
 	invalid_data [label="Invalid Please Try again"]
-	hash_to_check [label=hash_to_check]
+	hash_to_check [label="\"What is the Data or Hash to check?\""]
 	invalid [label="\"Not Valid\""]
 	valid [label="\"Valid\""]
 	exit_prompt [label="\"Exit? (y/n)\""]
