@@ -14,7 +14,7 @@ digraph finite_state_machine {
 	invalid [label="\"Not Valid\""]
 	valid [label="\"Valid\""]
 	exit_prompt [label="\"Exit? (y/n)\""]
-	account_created_conformation -> s_start
+	account_created_conformation -> Actions
 	Actions -> hash_and_add_item [label="ADD"]
 	Actions -> return_stored_items [label="SHOW"]
 	Actions -> show_public_address [label="ADDR"]
