@@ -1,25 +1,40 @@
 digraph finite_state_machine {
-    Actions [label="\"Actions: \lPrint Address: ADDR\lAdd Item: ADD <Text to add>\lShow Items: SHOW\lCheck Identity: CHECK\""];
-    "Session Start" -> "Current User?"
-    "Current User?" -> "\"Create Account? (y/n)\"" [label="No"]
-    "\"Create Account? (y/n)\"" -> "Session Start" [label="\"N\""]
-    "\"Create Account? (y/n)\"" -> "\"Account Created\"" [label="\"Y\""]
-    "\"Account Created\"" -> "Session Start"
-    "Current User?" -> Actions [label="Yes"]
-    Actions -> "Return Address" [label="ADDR"]
-    "Return Address" -> Actions
-    Actions -> "Add Item" [label="ADD"]
-    "Add Item" -> Actions
-    Actions -> "Return Stored items" [label="SHOW"]
-    "Return Stored items" -> Actions
-    Actions -> "\"What is the Address?\"" [label="CHECK"]
-    "\"What is the Address?\""-> "Invalid Please Try again" [label="Invalid"]
-    "Invalid Please Try again" -> "\"What is the Address?\""
-    "\"What is the Address?\"" -> "\"What is the Data or Hash to check?\"" [label="Valid"]
-    "\"What is the Data or Hash to check?\"" -> "\"Not Valid\"" [label="String in Contract"]
-    "\"What is the Data or Hash to check?\"" -> "\"Valid\"" [label="String not in Contract"]
-    "\"Valid\"" -> "\"Exit?\""
-    "\"Not Valid\"" -> "\"Exit? (y/n)\""
-    "\"Exit? (y/n)\"" -> Actions [label="Y"]
-    "\"Exit? (y/n)\"" -> "\"What is the Data or Hash to check?\"" [label="N"]
+	Actions [label="Actions: \lPrint Address: ADDR\lAdd Item: ADD <Text to add>\lShow Items: SHOW\lCheck Identity: CHECK"];
+	s_start [label="Session Start"]
+	current_user [label="Current User?"]
+	create_account [label="\"Create Account? (y/n)\""]
+	account_created_conformation [label="\"Account Created\""]
+	show_public_address [label="Return Address"]
+	hash_and_add_item [label="Add Item"]
+	// This call will require more than one text back
+	return_stored_items [label="Return Stored items"]
+	what_is_the_address [label="\"What is the Address?\""]
+	invalid_data [label="Invalid Please Try again"]
+	hash_to_check [label=hash_to_check]
+	invalid [label="\"Not Valid\""]
+	valid [label="\"Valid\""]
+	exit_prompt [label="\"Exit? (y/n)\""]
+	account_created_conformation -> s_start
+	Actions -> hash_and_add_item [label="ADD"]
+	Actions -> return_stored_items [label="SHOW"]
+	Actions -> show_public_address [label="ADDR"]
+	Actions -> what_is_the_address [label="CHECK"]
+	create_account -> account_created_conformation [label="\"Y\""]
+	create_account -> s_start [label="\"N\""]
+	current_user -> Actions [label="Yes"]
+	current_user -> create_account [label="No"]
+	exit_prompt -> Actions [label="Y"]
+	exit_prompt -> hash_to_check [label="N"]
+	hash_and_add_item -> Actions
+	hash_to_check -> invalid [label="String in\lContract"]
+	hash_to_check -> valid [label="String not\lin Contract"]
+	invalid -> exit_prompt
+	invalid_data -> what_is_the_address
+	return_stored_items -> Actions
+	s_start -> Actions [style=invis]
+	s_start -> current_user
+	show_public_address -> Actions
+	valid -> exit_prompt
+	what_is_the_address -> hash_to_check [label="Valid"]
+	what_is_the_address-> invalid_data [label="Invalid"]
 }
