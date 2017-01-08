@@ -1,5 +1,5 @@
 from flask import Flask, request
-from test import LiteIDContract
+from LiteIDContractTools import LiteIDContract
 import twilio.twiml
 import hashlib
 import signal
@@ -7,13 +7,15 @@ import shelve
 import random
 import re
 
+
 class InteractionStateMachine:
 	def __init__(self, number):
 		self.registered = False
 		self.number = number
 		self.state = "Start"
 		self.items = {}
-		self.Privatekey = "lol"
+		self.LiteIDC = LiteIDContract()
+		self.LiteIDC.create_contract(number)
 		self.AddressCheck = ""
 
 	def run(self, body):
@@ -43,6 +45,7 @@ class InteractionStateMachine:
 			m = re.match(u"ADD(.*)", body, flags=re.IGNORECASE)
 			if m:
 				res = self._caculate_hash(m.group(1).strip())
+				self.LiteIDC.add_hash(m.group(1).strip())
 				self.items[res[2]] = res
 				return "added {}".format(m.group(1).strip())
 			else:
@@ -50,7 +53,7 @@ class InteractionStateMachine:
 		elif "show" in body[0:6].lower():
 			output = ""
 			for i in self.items:
-				output += "{}\n".format(i[3])
+				output += "{}\n".format(self.items[i][3])
 			return output
 		elif "check" in body[0:5].lower():
 			self.state = "AddressCheck"
@@ -83,7 +86,7 @@ class InteractionStateMachine:
 			return "What is the hash to check?"
 		elif "exit" in body.lower():
 			self.state = "Actions"
-			return "Account Created\n\nActions: \nPrint Address: ADDR\nAdd Item: ADD <Text to add>\nShow Items: SHOW\nCheck Identity: CHECK"
+			return "Actions: \nPrint Address: ADDR\nAdd Item: ADD <Text to add>\nShow Items: SHOW\nCheck Identity: CHECK"
 		else:
 			return "Invalid address Try again or EXIT to exit"
 
@@ -107,7 +110,7 @@ class InteractionStateMachine:
 	def exit_prompt(self, body):
 		if "y" in body[0:6].lower():
 			self.state = "Actions"
-			return "Account Created\n\nActions: \nPrint Address: ADDR\nAdd Item: ADD <Text to add>\nShow Items: SHOW\nCheck Identity: CHECK"
+			return "Actions: \nPrint Address: ADDR\nAdd Item: ADD <Text to add>\nShow Items: SHOW\nCheck Identity: CHECK"
 		else:
 			self.state = "HashCheck"
 			return "What is the hash to check?"
@@ -115,6 +118,7 @@ class InteractionStateMachine:
 
 app = Flask(__name__)
 db = shelve.open('storage.db', writeback=True)
+
 
 @app.route("/", methods=['GET', 'POST'])
 def main_entry():
@@ -125,9 +129,9 @@ def main_entry():
 		print "New number {}".format(number)
 		temp = InteractionStateMachine(number)
 		db[number] = temp
-	message = str(db[number].run(request.values.get('Body')))
+	message = str(db[number].run(str(request.values.get('Body'))))
 	resp.message(message)
-	print "responded to \"{}\" with \"{}\"".format(request.values.get('Body'), message)
+	print "responded to \"{}\" with \"{}\"".format(str(request.values.get('Body')), message)
 	return str(resp)
 
 
@@ -139,4 +143,4 @@ def cleanup(signal, frame):
 signal.signal(signal.SIGINT, cleanup)
 
 if __name__ == "__main__":
-	app.run(debug=True, host='0.0.0.0')
+	app.run(host='0.0.0.0')
